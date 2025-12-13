@@ -1,0 +1,62 @@
+[
+    {
+        "Nombre": "Unos",
+        "Tipo": "suma",
+        "Requerimiento": "1",
+        "Puntaje": "ninguno"
+    },
+    {
+        "Nombre": "Doses",
+        "Tipo": "suma",
+        "Requerimiento": "2",
+        "Puntaje": "ninguno"
+    },
+    {
+        "Nombre": "Treses",
+        "Tipo": "suma",
+        "Requerimiento": "3",
+        "Puntaje": "ninguno"
+    },
+    {
+        "Nombre": "Cuatros",
+        "Tipo": "suma",
+        "Requerimiento": "4",
+        "Puntaje": "ninguno"
+    },
+    {
+        "Nombre": "Cincos",
+        "Tipo": "suma",
+        "Requerimiento": "5",
+        "Puntaje": "ninguno"
+    },
+    {
+        "Nombre": "Seises",
+        "Tipo": "suma",
+        "Requerimiento": "6",
+        "Puntaje": "ninguno"
+    },
+    {
+        "Nombre": "Escalera",
+        "Tipo": "estatico",
+        "Requerimiento": "secuencia",
+        "Puntaje": "20"
+    },
+    {
+        "Nombre": "Full",
+        "Tipo": "estatico",
+        "Requerimiento": "2 y 3",
+        "Puntaje": "30"
+    },
+    {
+        "Nombre": "Poker",
+        "Tipo": "estatico",
+        "Requerimiento": "4 y 1",
+        "Puntaje": "40"
+    },
+    {
+        "Nombre": "Generala",
+        "Tipo": "estatico",
+        "Requerimiento": "todos",
+        "Puntaje": "50"
+    }
+]
