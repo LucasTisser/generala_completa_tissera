@@ -16,107 +16,116 @@ def cargar_categorias():
         categorias_lista = json.load(info)
         return categorias_lista
 
-# Funcion que solo funciona para printear dados que vayan tirando durante el juego
-def print_dados(dados):
-    for i in range(1,len(dados) + 1):
-        print(f" D.{i}°",end="  ")
-    print()
-    for i in dados:
-        print(f"┌───┐", end="  ")
-    print()
-    for i in dados:
-        print(f"│ {i} │", end="  ")
-    print()
-    for i in dados:
-        print(f"└───┘", end="  ")
-    print()
-
-def decidir_orden(list_jug):
-    # cada jugador tira un dado y se guardan en un diccionario, dentro de una lista
-    # se evaluan los valores de cada dado y el mayor numero sera el primero
-    # se muestra quien gano y comienza a tirar los dados
+def decidir_orden(list_jug, mostrar_texto, esperar_turno, mostrar_dados):
     info_jugadores = []
-    dado_ganador = 0
-    ganador = {}
-    print("<<<<<<------ Tiren los dados para decidir quien sera el que comienze el juego. ------>>>>>>")
 
-    #   Ciclo para que cada jugador tire un dado y quede guardado su nombre y dado
+    mostrar_texto("<<<<<<------ Tiren los dados para decidir quien comienza ------>>>>>>")
+
+    # primer tiro
     for jug in list_jug:
-        input(f"Turno de {jug["nombre"]}. Presione enter para tirar los dados.")
-        time.sleep(1)
-        dado = random.randint(1,6)
-        datos_jug = {
-            "nombre" : jug["nombre"],
-            "dado" : dado
-        }
-        info_jugadores.append(datos_jug)
-        print_dados([dado])
-        print()
-    
-    # Si no hay repetidos, saltea el condicional
-    valores = [j["dado"] for j in info_jugadores]
-    if len(valores) != len(set(valores)):
-        #   Envia solo los dados en empate con el mayor numero de todos
-        maximo = max(j["dado"] for j in info_jugadores)
-        empatados = [j for j in info_jugadores if j["dado"] == maximo]
-        v.resolver_empates(empatados)
+        esperar_turno(f"Turno de {jug['nombre']}. Presione para tirar el dado.")
+        dado = random.randint(1, 6)
+        info_jugadores.append({
+            "nombre": jug["nombre"],
+            "dado": dado
+        })
+        mostrar_dados([dado])
 
-    #   Ciclo para leer los dados y captar al jugador que tiro mejor
-    for jug in info_jugadores:
-        if jug["dado"] > dado_ganador:
-            dado_ganador = jug["dado"]
-            ganador = jug
+    # resolver empates solo entre los máximos
+    while True:
+        max_valor = max(j["dado"] for j in info_jugadores)
+        maximos = [j for j in info_jugadores if j["dado"] == max_valor]
 
-    # Ordena los jugadores de mayor a menor puntuacion de dado, listo para comenzar el primer turno
-    info_jugadores.sort(key=lambda j: j["dado"],reverse=True)
-    print("< < < < < < - - - - - - - - - - - - - - - - > > > > > >")
-    print(f"      El jugador {ganador["nombre"]} gano la ronda!. Comenzara primero")
-    print("< < < < < < - - - - - - - - - - - - - - - - > > > > > >")
+        if len(maximos) == 1:
+            break  # ya hay un único ganador
+
+        mostrar_texto("Hay empate entre los que sacaron el mayor valor. Se vuelven a tirar esos jugadores.")
+
+        # solo los jugadores empatados tiran de nuevo
+        for j in maximos:
+            esperar_turno(f"Turno de {j['nombre']} para desempatar")
+            j["dado"] = random.randint(1, 6)
+            mostrar_dados([j["dado"]])
+
+    # ordenar por dado
+    info_jugadores.sort(key=lambda j: j["dado"], reverse=True)
+    ganador = info_jugadores[0]
+    mostrar_texto(f"\nEl jugador {ganador['nombre']} comienza primero.\n")
+
     return info_jugadores
 
+
+
+'''
 def principio_juego():
-    #   se piden los jugadores que desean jugar
+    # 1) pedir cantidad de jugadores (validación)
     cant_jugadores = v.validar_cant_jugadores_es_digito_y_entero()
-    
-    #   se pide el nombre de cada jugador
-    jugadores = r.registrar_jugador(cant_jugadores,url_jugadores)
 
-    r.creacion_tablero(url_tablero,url_categorias,url_jugadores)
+    # 2) pedir nombres desde la interfaz (consola)
+    nombres = ui.pedir_nombres_jugadores(cant_jugadores)
 
-    #   una vez guarda los nombres de cada jugador, comienza a tirar cada uno un dado
-    lista_jug_ordenadas = decidir_orden(jugadores)
+    # 3) construir y guardar jugadores (datos)
+    jugadores = r.construir_jugadores(nombres)
+    r.guardar_jugadores(jugadores, url_jugadores)
+
+    # 4) crear tablero
+    r.creacion_tablero(url_tablero, url_categorias, url_jugadores)
+
+    # 5) decidir orden
+    lista_jug_ordenadas = decidir_orden(
+        jugadores,
+        mostrar_texto=ui.mostrar_texto,
+        esperar_turno=ui.esperar_enter,
+        mostrar_dados=ui.mostrar_dados
+    )
+    return lista_jug_ordenadas
+'''
+
+def principio_juego(pedir_nombres, mostrar_texto, esperar_turno, mostrar_dados):
+    cant_jugadores = v.validar_cant_jugadores_es_digito_y_entero()
+    nombres = pedir_nombres(cant_jugadores)
+    jugadores = r.construir_jugadores(nombres)
+    r.guardar_jugadores(jugadores, url_jugadores)
+    r.creacion_tablero(url_tablero, url_categorias, url_jugadores)
+    lista_jug_ordenadas = decidir_orden(
+        jugadores,
+        mostrar_texto=mostrar_texto,
+        esperar_turno=esperar_turno,
+        mostrar_dados=mostrar_dados
+    )
     return lista_jug_ordenadas
 
-def elegir_conservados(dados):
+
+
+
+def validar_conservados(dados, eleccion: str):
+    """
+    dados: lista de valores de dados (len = 5)
+    eleccion: string ingresado por el usuario
+
+    Retorna:
+    (True, lista_indices) si es válido
+    (False, mensaje_error) si no es válido
+    """
     cant_dados = len(dados)
-    while True:
-        eleccion = input(
-            f"Ingrese las posiciones a conservar (1-{cant_dados}, separadas por espacios, o vacío para ninguna): "
-        ).strip()
 
-        # Caso entrada vacía → no conserva nada
-        if eleccion == "":
-            return []
+    # Caso vacío → no conserva ninguno
+    if eleccion == "":
+        return True, []
 
-        partes = eleccion.split()
+    partes = eleccion.split()
 
-        # Valida que todas las partes sean dígitos
-        if not all(p.isdigit() for p in partes):
-            print("Error: Solo se permiten números separados por espacios.\n")
-            continue
+    if not all(p.isdigit() for p in partes):
+        return False, "Solo se permiten números separados por espacios."
 
-        # Convierte a índices
-        indices = [int(p) for p in partes]
+    indices = [int(p) for p in partes]
 
-        # Valida rango
-        if not all(1 <= x <= cant_dados for x in indices):
-            print(f"Error: Las posiciones válidas son del 1 al {cant_dados}.\n")
-            continue
+    if not all(1 <= x <= cant_dados for x in indices):
+        return False, f"Las posiciones válidas son del 1 al {cant_dados}."
 
-        # Eliminar duplicados
-        indices = sorted(set(x - 1 for x in indices))
-
-        return indices
+    # convertir a base 0 y eliminar duplicados
+    indices = sorted(set(x - 1 for x in indices))
+    return True, indices
 
 def aplicar_conservados_y_tirar(dados_actuales, indices_conservados):
     #   dados_actuales: lista de 5 valores
@@ -211,109 +220,111 @@ def puntajes_disponibles(dados, categorias):
             #agregar que cuando sea el primer tiro sume 100 puntos
     return resultados
 
-def elegir_categoria(puntajes, categorias, jugador) -> dict:
+def validar_categoria(eleccion: str, puntajes, categorias, jugador):
     """
-    puntajes: lista con los valores calculados para cada categoria
-    categorias: lista de dicts como en tu JSON
-    jugador: dict con {"nombre":..., "puntaje":{categorias: valor}}
+    Retorna:
+    (True, dict) si es válida
+    (False, mensaje_error) si no lo es
     """
-    while True:
-        eleccion = input('Ingrese una categoria a anotar: ').strip()
-        if eleccion.isdigit():
-            idx = int(eleccion) - 1
-            if 0 <= idx < len(categorias):
-                nombre_cat = categorias[idx]["Nombre"]
-                # Obtener si el jugador ya anotó
-                valor_existente = jugador["puntaje"][nombre_cat]
-                # Si NO es "0", entonces ya usó esa categoría
-                if valor_existente != "0":
-                    print(f"Ya anotaste en '{nombre_cat}'. Elegí otra categoría.\n")
-                    continue
-                # Si es "0", puede anotarla
-                print(f'Elegiste la categoría {eleccion}. {nombre_cat}')
-                return {
-                    "nombre_cat": nombre_cat,
-                    "puntaje": puntajes[idx]
-                }
-            else:
-                print("Número fuera de rango.\n")
-                continue
+    if not eleccion.isdigit():
+        return False, "Debe ingresar un número."
+
+    idx = int(eleccion) - 1
+    if not (0 <= idx < len(categorias)):
+        return False, "Número fuera de rango."
+
+    nombre_cat = categorias[idx]["Nombre"]
+
+    # ya anotada
+    if jugador["puntaje"][nombre_cat] != "0":
+        return False, f"Ya anotaste en '{nombre_cat}'. Elegí otra categoría."
+
+    return True, {
+        "nombre_cat": nombre_cat,
+        "puntaje": puntajes[idx]
+    }
 
 # Funcion central para determinar el ganador de la partida
 # Se encarga de los turnos de todos los jugadores a traves de un ciclo
-def turno_jugadores(rondas, list_jug, categorias):
-    print(f"\t\tRonda {rondas - 1}")
+def turno_jugadores(
+    rondas,
+    list_jug,
+    categorias,
+    mostrar_texto,
+    esperar_turno,
+    mostrar_dados,
+    pedir_conservados,
+    pedir_categoria,
+    mostrar_tablero,
+    obtener_puntos_jugadores,
+    actualizar_tablero
+):
+    mostrar_texto(f"\t\tRonda {rondas - 1}")
+
     for jugador in list_jug:
-        #   Muestra que es el turno del jugador
-        print("< < < < - - - - - - - - - - - - - - - - > > > >")
-        print(f"\t\tTurno de {jugador["nombre"]}")
-        print("< < < < - - - - - - - - - - - - - - - - > > > >")
+        # Turno del jugador
+        mostrar_texto("< < < < - - - - - - - - - - - - - - - - > > > >")
+        mostrar_texto(f"\t\tTurno de {jugador['nombre']}")
+        mostrar_texto("< < < < - - - - - - - - - - - - - - - - > > > >")
 
         # ===== PRIMER TIRO =====
-        input("Presione enter para el tiro 1")
+        esperar_turno("Presione enter para el tiro 1")
         time.sleep(2)
         dados = tirar_dados(5)
-        r.print_tablero(url_tablero)
-        print("Primer Tiro:")
-        print_dados(dados)
-        conservados = elegir_conservados(dados)
+        mostrar_tablero()
+        mostrar_texto("Primer Tiro:")
+        mostrar_dados(dados)
+        conservados = pedir_conservados(dados)
 
         # ===== SEGUNDO TIRO =====
-        input("Presione enter para el tiro 2")
+        esperar_turno("Presione enter para el tiro 2")
         time.sleep(2)
         dados = aplicar_conservados_y_tirar(dados, conservados)
-        r.print_tablero(url_tablero)
-        print("Segundo Tiro:")
-        print_dados(dados)
-        conservados = elegir_conservados(dados)
+        mostrar_tablero()
+        mostrar_texto("Segundo Tiro:")
+        mostrar_dados(dados)
+        conservados = pedir_conservados(dados)
 
         # ===== TERCER TIRO =====
-        input("Presione enter para el tiro 3")
+        esperar_turno("Presione enter para el tiro 3")
         time.sleep(2)
         dados = aplicar_conservados_y_tirar(dados, conservados)
-        r.print_tablero(url_tablero)
-        print("Tercer tiro:")
-        print_dados(dados)
+        mostrar_tablero()
+        mostrar_texto("Tercer tiro:")
+        mostrar_dados(dados)
 
-        puntos_jugs = r.puntos_jug_tablero(url_tablero)
+        # ===== PUNTAJES =====
+        puntos_jugs = obtener_puntos_jugadores()
+        tabla_puntajes = puntajes_disponibles(dados, categorias)
 
-        tabla_puntajes = puntajes_disponibles(dados, categorias)        
-        print('--------- Posibles opciones de anotar --------')
+        mostrar_texto('--------- Posibles opciones de anotar --------')
         for i in range(len(categorias)):
-            print(f'{i+1}). {categorias[i]['Nombre']}: {tabla_puntajes[i]}')
+            mostrar_texto(f'{i+1}). {categorias[i]["Nombre"]}: {tabla_puntajes[i]}')
 
-        jug = dict() 
-        # Condicion para obtener el id del jugador con la info, para usarla en <elegir categoria>
-        for jug_id in range(0,len(puntos_jugs)):
-            if jugador["nombre"] == puntos_jugs[jug_id]["nombre"]:
-                jug = puntos_jugs[jug_id]
-        cat_y_puntos = elegir_categoria(tabla_puntajes, categorias, jug) # cambia esto despues con un verdadero modelo para los puntos asi se aplica bien
+        # Buscar jugador actual en puntos_jugs
+        jug = next((pj for pj in puntos_jugs if pj["nombre"] == jugador["nombre"]), {})
+
+        cat_y_puntos = pedir_categoria(tabla_puntajes, categorias, jug)
 
         jug_puntos = {
             "nombre": jugador["nombre"],
-            "categoria" : cat_y_puntos["nombre_cat"],
+            "categoria": cat_y_puntos["nombre_cat"],
             "valor": cat_y_puntos["puntaje"]
         }
 
-        r.actualizar_tablero(url_tablero,jug_puntos,url_jugadores)
-        r.print_tablero(url_tablero)
+        actualizar_tablero(jug_puntos)
+        mostrar_tablero()
 
+    # ===== DETERMINAR GANADOR =====
+    puntos_jugs = obtener_puntos_jugadores()
     punt_ganador = 0
-    ganador = dict()
+    ganador = {}
     est_cont = []
-    #retornar al ganador
-    for i in range(0, len(puntos_jugs)):
-        if puntos_jugs[i]["puntajeTotal"] > punt_ganador:
-            punt_ganador = puntos_jugs[i]["puntajeTotal"]
-            ganador = puntos_jugs[i]
 
-            est_dict = {
-                "nombre" : puntos_jugs[i]["nombre"],
-                "puntaje_total": puntos_jugs[i]["puntajeTotal"]
-            }
-            est_cont.append(est_dict)
+    for pj in puntos_jugs:
+        if pj["puntajeTotal"] > punt_ganador:
+            punt_ganador = pj["puntajeTotal"]
+            ganador = pj
+        est_cont.append({"nombre": pj["nombre"], "puntaje_total": pj["puntajeTotal"]})
 
-    return {
-                "ganador" : ganador,
-                "estadistica" : est_cont
-            }
+    return {"ganador": ganador, "estadistica": est_cont}
