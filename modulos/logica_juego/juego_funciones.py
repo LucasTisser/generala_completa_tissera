@@ -54,33 +54,6 @@ def decidir_orden(list_jug, mostrar_texto, esperar_turno, mostrar_dados):
 
     return info_jugadores
 
-
-
-'''
-def principio_juego():
-    # 1) pedir cantidad de jugadores (validación)
-    cant_jugadores = v.validar_cant_jugadores_es_digito_y_entero()
-
-    # 2) pedir nombres desde la interfaz (consola)
-    nombres = ui.pedir_nombres_jugadores(cant_jugadores)
-
-    # 3) construir y guardar jugadores (datos)
-    jugadores = r.construir_jugadores(nombres)
-    r.guardar_jugadores(jugadores, url_jugadores)
-
-    # 4) crear tablero
-    r.creacion_tablero(url_tablero, url_categorias, url_jugadores)
-
-    # 5) decidir orden
-    lista_jug_ordenadas = decidir_orden(
-        jugadores,
-        mostrar_texto=ui.mostrar_texto,
-        esperar_turno=ui.esperar_enter,
-        mostrar_dados=ui.mostrar_dados
-    )
-    return lista_jug_ordenadas
-'''
-
 def principio_juego(pedir_nombres, mostrar_texto, esperar_turno, mostrar_dados):
     cant_jugadores = v.validar_cant_jugadores_es_digito_y_entero()
     nombres = pedir_nombres(cant_jugadores)

@@ -1,34 +1,34 @@
 [
     {
-        "nombre": "Lu",
+        "nombre": "Cami",
         "puntaje": {
             "Unos": "0",
             "Doses": "0",
             "Treses": "0",
-            "Cuatros": "0",
+            "Cuatros": 8,
             "Cincos": "0",
             "Seises": "0",
-            "Escalera": "0",
+            "Escalera": 20,
             "Full": "0",
             "Poker": "0",
             "Generala": "0"
         },
-        "puntajeTotal": 0
+        "puntajeTotal": 28
     },
     {
-        "nombre": "CA",
+        "nombre": "Lucas",
         "puntaje": {
             "Unos": "0",
             "Doses": "0",
             "Treses": "0",
             "Cuatros": "0",
-            "Cincos": "0",
+            "Cincos": 10,
             "Seises": "0",
             "Escalera": "0",
             "Full": "0",
             "Poker": "0",
-            "Generala": "0"
+            "Generala": 0
         },
-        "puntajeTotal": 0
+        "puntajeTotal": 10
     }
 ]
