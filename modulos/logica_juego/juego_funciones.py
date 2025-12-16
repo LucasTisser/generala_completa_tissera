@@ -68,9 +68,6 @@ def principio_juego(pedir_nombres, mostrar_texto, esperar_turno, mostrar_dados):
     )
     return lista_jug_ordenadas
 
-
-
-
 def validar_conservados(dados, eleccion: str):
     """
     dados: lista de valores de dados (len = 5)

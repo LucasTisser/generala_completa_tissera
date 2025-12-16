@@ -1,6 +1,7 @@
 import pygame
+from modulos.interfaz.pygame_interface.core.config import ANCHO , BLANCO
 
-def crear_boton(x, y, ancho, alto, texto, fuente, color_texto=(0,0,0)):
+def crear_boton(x, y, ancho, alto, texto, fuente, color_texto=(255,255,255)):
     return {
         "rect": pygame.Rect(x, y, ancho, alto),
         "texto": fuente.render(texto, True, color_texto),
@@ -12,7 +13,7 @@ def dibujar_boton(pantalla, boton):
     texto = boton["texto"]
 
     if boton.get("hover", False):
-        # Hover → fondo blanco, borde negro
+        # Hover → borde blanco
         pygame.draw.rect(pantalla, (255, 255, 255), rect,  5, border_radius=10)
     else:
         # Normal → fondo transparente (solo borde negro)
@@ -26,15 +27,21 @@ def clickeado(boton, pos_mouse):
     return boton["rect"].collidepoint(pos_mouse)
 
 def dibujar_boton_icono(pantalla, boton, icono):
-
-    #pygame.draw.rect(pantalla, (0, 0, 0), boton["rect"], 5, border_radius=10)
-
     if boton.get("hover", False):
-        # Hover → fondo blanco, borde negro
+        # Hover →, borde blanco
         pygame.draw.rect(pantalla, (255, 255, 255), boton["rect"],  5, border_radius=10)
     else:
         # Normal → fondo transparente (solo borde negro)
         pygame.draw.rect(pantalla, (0, 0, 0), boton["rect"], 5, border_radius=10)
 
-
     pantalla.blit(icono, (boton["rect"].x + 5, boton["rect"].y + 5))
+
+# ---------------------------------------------------------------------------------------
+#                           B O T O N E S
+
+
+def crear_boton_tirar(fuente):
+    boton_tirar = crear_boton(ANCHO//2 - 100, 600, 200, 50, "Tirar dados", fuente, BLANCO)
+
+def crear_boton_mute(fuente):
+    return crear_boton(20, 20 , 70, 70, "", fuente, BLANCO)

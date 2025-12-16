@@ -7,9 +7,11 @@
 # Luego de estar sobre la venv, instalamos pygame con el siguiente comando
 # pip install pygame
 
-# Para abrir pygame, ejecutar el siguiente comando en esta raiz
+# Para abrir pygame, ejecutar el siguiente comando sobre esta ruta
 # python -m modulos.interfaz.pygame_interface.ui_pygame
 
+# Congela dependencias para cualquiera pueda recrear el entorno
+#pip freeze > requirements.txt
 
 import modulos.juego_estado as juego
 import modulos.datos.datos_funciones as d
