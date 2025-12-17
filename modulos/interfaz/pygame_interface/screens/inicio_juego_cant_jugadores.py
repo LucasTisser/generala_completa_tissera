@@ -51,3 +51,4 @@ def seleccionar_cantidad_jugadores(pantalla, fuente, fondo, musica_act, btn_mute
                     if clickeado(boton, pos):
                         #sonido_click.play()
                         return i, musica_act  # devuelve 2, 3 o 4
+                    

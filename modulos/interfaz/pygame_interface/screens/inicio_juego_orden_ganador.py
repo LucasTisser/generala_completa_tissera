@@ -6,7 +6,7 @@ from modulos.interfaz.pygame_interface.core.utils import toggle_musica , manejar
 
 def mostrar_orden_final(pantalla, fuente, jugadores_ordenados, fondo, musica_act, btn_mute, icon_sonido, icon_mute, tamaño_dado=60):
     pantalla.blit(fondo, (0, 0))
-
+    imgs_dados = cargar_img_dados()
     y = 150
     for i, j in enumerate(jugadores_ordenados, start=1):
         # texto centrado
@@ -15,7 +15,7 @@ def mostrar_orden_final(pantalla, fuente, jugadores_ordenados, fondo, musica_act
         pantalla.blit(texto, (x_texto, y))
 
         # dado al lado del nombre
-        imagen = pygame.transform.scale(cargar_img_dados[j["dado"]], (tamaño_dado, tamaño_dado))
+        imagen = pygame.transform.scale(imgs_dados[j["dado"]], (tamaño_dado, tamaño_dado))
         x_dado = x_texto + texto.get_width() + 10
         pantalla.blit(imagen, (x_dado, y))
 

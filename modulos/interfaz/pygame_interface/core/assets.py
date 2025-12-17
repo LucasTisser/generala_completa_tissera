@@ -3,6 +3,7 @@ import pygame
 from modulos.interfaz.pygame_interface.core.config import ANCHO, ALTO
 # ----------------------------------------------------------
 #                     I M A G E N E S
+
 def cargar_fondo():
     fondo = pygame.image.load("assets/imagenes/fondo_menu.jpg")
     fondo = pygame.transform.scale(fondo, (ANCHO, ALTO))
@@ -14,6 +15,14 @@ def blit_fondo(pantalla, fondo):
 def cargar_logo():
     logo = pygame.image.load("assets/imagenes/logo_generala.png")
     logo = pygame.transform.scale(logo, (300, 300))
+    return logo
+
+def blit_logo(pantalla, logo):
+    # Obtener rectángulo del logo
+    rect_logo = logo.get_rect()
+    # Centrar en pantalla
+    rect_logo.center = (ANCHO // 2, ALTO // 2 - 165)  # el -100 es opcional para subirlo un poco
+    pantalla.blit(logo, rect_logo)
 
 def cargar_img_dados():
     imagenes_dados = {

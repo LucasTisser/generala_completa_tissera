@@ -1,6 +1,5 @@
 from modulos.logica_juego.juego_funciones import cargar_categorias
 
-
 ANCHO = 1280
 ALTO = 720
 

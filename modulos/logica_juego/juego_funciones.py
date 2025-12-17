@@ -10,9 +10,9 @@ url_tablero = "./json/tablero.json"
 url_categorias = "./json/categorias.json"
 
 def cargar_categorias():
-    if not os.path.exists('json/categorias.json'):
+    if not os.path.exists(url_categorias):
         return [] 
-    with open('json/categorias.json', 'r', encoding="utf-8")  as info:
+    with open(url_categorias, 'r', encoding="utf-8")  as info:
         categorias_lista = json.load(info)
         return categorias_lista
 
